@@ -1,0 +1,8 @@
+"Test Steps:,,,,,,,,,,,,
+Step ,Items Tested,,Action,,Expected Results,,,Actual Results,,,Status,Recorded By"
+"1,","SSR21297",,Open the application.," Facility selection modal should be appeared.",,,,,,
+"2,","SSR21297,",Navigate to the page where the facility selection is supposed to happen.," Facility selection modal should be appeared.		,,,,,,"
+"3,","SSR21297,","Perform the action that should trigger the facility selection modal (e.g., clicking a button or link)."," Facility selection modal should be appeared.		,,,,,,"
+"Test Case Name,,""Select Organization to begin with data upload.
+<organation selection"",Test Case Description,,Data Upload Utility web app shall require an organization to be selected before beginning the data upload workflow.,,,,,,,
+Created By,,,Reviewed By,,,,Version,,,,,"
