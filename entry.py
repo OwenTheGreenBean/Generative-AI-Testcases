@@ -6,7 +6,7 @@ class Entry:
         self.ID = entry_ID
         self.Description = description
         self.Requirment = requirment
-        self.Prompt = "Write me a test case for the following requirement " + requirment + ' in the following format using short sentances: "Test steps: " "Test Rationale: " "Sample Size: " and "Sample Size Rationale: "'
+        self.Prompt = "Write me a test case for the following requirement " + requirment + ' in the following format: "Test Setup in number:" , "Test steps in number:"'
         self.Response = "No Response Generated"
         self.Status = "imported"
 

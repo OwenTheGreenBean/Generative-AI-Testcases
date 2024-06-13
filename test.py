@@ -1,35 +1,26 @@
-from testcases import Testcases
-import tkinter as tk
-from tkinter import *
-import copilot_calls
 import asyncio
-from tkinter.filedialog import askopenfilename
-from PIL import Image, ImageTk
+import os
+
+from sydney import SydneyClient
+
+os.environ["BING_U_COOKIE"] = "<_C_Auth=; _C_Auth=; MUIDB=10064DCB43C869790B1C594B4244680B; MC1=GUID=cb61016bf71148e5a251d2ac22c69c4b&HASH=cb61&LV=202405&V=4&LU=1716297933486; _clck=p76ohd%7C2%7Cfly%7C0%7C1602; _fbp=fb.1.1716297935926.513477408; USRLOC=HS=1; SRCHD=AF=NOFORM; SRCHUID=V=2&GUID=2C9F402CFA854DF890648F83CE2368E1&dmnchg=1; MUID=10064DCB43C869790B1C594B4244680B; BFBUSR=CMUIDBCE=2; BFB=AxBbKZ2MSxjf9cHEmRcJPr3Egr1HSCuV5ATpWe44TWweTsgb0DLZYekPZ_mIenXe8LVOlSAnq2GK_PfEofquS-gCE7NzrPZ1RNEivxbE3NR_UXw7njdVZbkadsJLJfmbEYRR_JHlcj1SpFTerzQwNNuHoQMlWLivv7Y34Tl5dJpkDp2zyu1QbB3Ddr4iLhfzrVmGEjrYSw22F17pLhUEu-oj; BFBFB=F%3D2%26L%3D2%26S%3D2%26SS%3D2%26E%3D2%26O%3D2%26EDS%3D2%26SDS%3D2%26CDS%3D2; SRCHUSR=DOB=20240521&POEX=O; BFBRP=; ACL=AxDb0zb-CzQRecw3LTP2N71lMmK4xIYPjuZk-1gkN9JFQP6djFcuwbvjMhzhCRdFCQz89r4_AOd5_w_oo4NtelgM; ACLUSR=T=1717694641000; MSCC=NR; _C_Auth=; _EDGE_S=SID=30A95423503C6EAB116740B551BF6FB8; _Rwho=u=d&ts=2024-06-06; _SS=SID=30A95423503C6EAB116740B551BF6FB8&R=0&RB=0&GB=0&RG=200&RP=0; MS0=ad321def68f84bf582cba11f685edb58; ak_bmsc=A8A7CD601C42F9F48C8B395A6F1AD64A~000000000000000000000000000000~YAAQEZw6F9uVkuaPAQAALcjI7hhfC3KJ6HNXAZMHRLGdQ6gvIhZo3IEt4FDmjPWwrK2CzWNkharpEhdAb1Qm1a2gqGeNM7DFvp4w49IjwEf5pjdn58GQ4R8gBLkXgnghypjg8h3LrPrucQn2YNzyCJ4gXflVeVGi/7tvAb8bGCyciUI7EFKE7QODzmoW6pDrh8/U23bqepRHK6YB6DA+M/Y2V9zWQ4Hts26+1gpz6wEbQkvKRYPedkzcdE1VouaQtHjyWvFYpawMqmR1zr4I4wta7yLuLscCBUyAb6zwyS6ivVGasdyE8HzqgAKCoGvB5jvLwGQXfWMcECWvFssWu4WgRlnlYpuB5Djr+fmzJKl6ozISCoiWyOv1cwMUPQzTWI/NTmEU5G5p38ShNQ==; _RwBf=r=0&ilt=55&ihpd=6&ispd=0&rc=0&rb=0&gb=0&rg=200&pc=0&mtu=0&rbb=0&g=0&cid=&clo=0&v=6&l=2024-06-06T07:00:00.0000000Z&lft=0001-01-01T00:00:00.0000000&aof=0&ard=0001-01-01T00:00:00.0000000&rwdbt=0001-01-01T00:00:00.0000000&rwflt=0001-01-01T00:00:00.0000000&o=2&p=&c=&t=0&s=0001-01-01T00:00:00.0000000+00:00&ts=2024-06-06T18:21:27.3740239+00:00&rwred=0&wls=&wlb=&wle=&ccp=&cpt=&lka=0&lkt=1&aad=1&TH=; _uetsid=188e6bc021b111ef8c3b372f544b7522; _uetvid=9bae3390177511ef9acec3bea6d4ba7e; OID=AxBoL2ltgOdDj7kmdwxAiNmzr-74u4gdajr8nn1rEfQPGqqqWvW5ZSHvh8XK-7eSLnu9HFFdq5ocHhZ5goYPsNufncRb_xU8l1xuD_ow2TbjH1COjy_UL50B3nmLLys4JPk7HFsYad7J5LALPPoBS44W; OIDI=gxCqQhH6sowedDa9B2gCZ8YU1-j5ob0bmL-U7ay4Gkx6HP6UdVgWroG5eKAiwubK0uzVejL5pt0E_rDzVQZqMTJbHe0dWZ07qJclUyXRJJwHPSrZvJm6WIJjLUHr2t5s9JJ6OWBoSVQFp081HJazI6OwWE5m9u4CTtzJ9pwtXBGiksNsuWaQezGjeP0UiZRse_Fm5rwbBcplqn40PDA8_6RPDmPHtdQWsGWMYnToIAszjmXhoJPHAQ5v7LyszdNw5UoSwuT81yPVDsYBw0r0L69N9QeR6S1WrMYLMoW3RawsOmsFwi7PjTdtW_yQjCfG2aRbelnEWdtOkzDSyI61muXbBSgqnhiEQY4WwsiK51AoUv8_H9aaeFbrbFqLickNVBB6UjkujkgoKoVNHXWvWE6ZPjsyxSNn7xtxQ-p3Js3o_rVVE2CrK6crLwV0CrEELdz0wmS6kxTwmH_AwSE2HRZo9b2FFNm36-aj59iHefUbSibM1-t3sM_7HzjLP4YWiArjmKqIPRLrAByAr5oXJJyipdmIKzMzmCJZj7r4JXgsZEDdkyOeRejCpLGSPOtej5n4cIlnw4L9OjSR8n8FNp469t1O2vZxNfdkAkhW2led-1zRpuG8A-Fg0DglhXjwAXF7f80RlpWif-gxnyChZKI1VsXWySOvBV854wn_H4onqmpQaYXd1VDVD_32vZCaMiySxAfEzDeEUrPyl5-Ev-9878bITIuEeWvbLaRWZH6toDoO1QGdwX0WrRs6ip6duby2qak3gEx-8wr81cSgGmxOi6OZDbi-vr7G2Mg8uwh4ms2dFWu7z_nMeHRQxKk1a-BpEhCw8nYV9sOshxi4OtFn_e-j0FoYJVifX8lkXy2dJYcptf2ym6QxZ191GCp8zyRfei5FroL-8EZlCY5fPZTGuKLw8VY4C6x4XVsVyTJGbeBiE10eUjHMKrBSt8tSfQWg6g9ebcuDBx40mBndvlRBgIFV-929V9Vgk1Wp6cRfzYnQodYR3t1cF3O8rxx3YLiunMUpJwrO_GDzcbV-vschVMBQSVqSlR8ooPvXcPGXyQJPVyigIYcAUwKZDPZGxnXpFYKmGYHrt9E_gVYsJYSj3KTvkGrZPbNiGW-6vv99LN-KB5BSgy7LeDcdn1NOsGyx7NbmWdBu8AzAxas29u_nbhjI6tvvobXAq7UJNmpzPnhuzLe_madjS3VJjzHVK2dg8Q4gqkPKsu26KZpuw1As9AS_0YWOafFIaaFP2-_cq04VK3xAonJcA8we-rbhWX0dn5TNdsREPkEVkxoY6kyGfWJreGQI3GudabgB5-MzFYnU6EzDif-zRgn9tXX7qbxzxAMJ8JOnfkhG_ick-Y9Unaqaz6NhTQ94m60mgNDkeiaAlPyn9nQz44xnYQmTlAVqU2ptY3QL3lz6h3Z4Qxr6BsJtSYTl3Ftt6fvuAhGSGJti0RVS1PuLNWt8d45HvHrCtNV5pJkAv0zEoKkPJGp2ZJ6TVqNNbiqj0SGAHpSyRO3M6HNFi97nLdkTZQpnf1sQ2df39i7HxGoahC4TtpKVpj2J3nobuPnzw0E0YSdtoZxLDcHcdzTh58URBmpwLVcw5Aso5eZdrSbBe4mx8xgg6Dbi02VGmmTqfRGmTS3buRfGRPWBun_YXutaQnvFtM4u3opo6bbWflZmzhNT7Gd-7zUTXDtdGVgJwggVXoYpAUNQ1D5GiA8S1YiNG0sYBXfXvxfdVRnIwwoFsfDB40BBaTMOwDbnlYYkXWTUxsM3ZbAypmXni9R39k9rfCURYMC4pt21DDs9bVwYMGJIvwvPrYvQBNNI_1Zg7faD-Wy-wwfZn3kGs-XxfNZ-kh1wr7Gs6suFP-erYCjgipr2-gVb; OIDR=gxAw0ixDoHnCMiGuXYKFEfDqh0_4O1uiriWd45eCpdkJaaYTXfkVMXv87OjegmweFDWrQHvM3_To7LfttON_NOmTi46YcHindz1Y3tTgcDySD6MwuMKxgN8r2q7rSVOyNC1BpAW5qDGbkWU2kQO2ThkJ0KoP5bQHudnafKwGBDnpvwtWKhncxA0_YmB6GOBroL_E_FVHfSZaqFLXbZoE4T8Ay8azZhFHIKTrGL0jV0ypoZx619dzPUgU7zooodMX7p_knMh-1HVrGYeCF39EPMD2AmEjZrDBJHJ5rsmMIi5HP5Rt_v_InyhfCuwaK9Nv6vzY_uW8FJibWozHcx_ipLYxBNMbBEvbuaKKvaeyu0cCcwnp5JS2Dbbo6kmdu3AJwtHgBbjMAgl02SGM4J32oUNnr8rNRTw6Wrffh414dWeIJBu9t_ZF5tsofTfrpMPpZAB_DZnvMyCIw_v-PIwJDMP56DzCRBQa-3F09-yI9mQBPkPl9TSUzUNDkkjsXE6dUIjEAM60QXUDGbOQ1Nuwori6xaJWmgHeHENWZRBArBM7URjTfP0BaHnzIAH-Ws-0qjB_OU9Q1cQlmzRseVbDfwABpv799kQ9CzDLsMseudtoS_UVpzw08cAXRPiIHXEEXrMtiBw4HS66X_ssQULr9RlT7rJ-tDxxDFUqK-KCuzLMMRGXDPadFzFwpKD4KCVmUeCIU30G4ik0Jn5MmIxIh2SuFNW0IU7PjtCRB1_F0t0KouTDbXOq-XzKW6kekiYjRqtQuuz45a0fO_-e74bgrEa6pR38n3iKtVVkJ9E1ah-D8ELTWxbD8JIN1VqKlNLmfw9HkbZ06aFqE6p9dwxVWI5zXOXP2mPwiikrx1swWzJkPUt3ABbIjzo4x69IFsgNgdoekgya5USXTWQlIYTkSN6MtghsuNqcACdoKmC-KoMuPup7L0DrprD1YJci3aeWkoMGNPNiGLcFdcdCMH3JOexVg8zyWnZfacZuy0ncfckOuyvXEeDm9QeqPaTm1FaHi2tMYX_V9kdTAlX92864DNFP3EMnsrTBmJEJLsu0zY7vH8Whtk6gwDy7GLRSF2jhzn27QQ3IANqq-HKi9F047Hvygw7J5Ch1WVrNSGP2e610bSjFv5LYypNf0JXxl75NjvZM0RGaM5pAPsA0GMRuJQj0rqcruTcLRvH3skNzpBYfkA; bm_sv=AEFA5B89325CE606C374A045145A45D9~YAAQEZw6F8eWkuaPAQAA6s3I7hgvs5DVtNd4zgAuVEjAqoZVrleHwWekfWn6V5a7vKM3XgDrBJ/EORxjmHkeT+9eoQ+s3uoIZQXsAD6RHa7gR7WYwr3QXOW6CuNwOp0Ggi4TqoYNKQT6kG2EXRlkD56E8kzeWUw2/FGwbxOqwifdzpgqe7rCb8mDj54HuspS7KoGbRsasQf8FIbDrKNnMG4vkSD+tz7Gh0CXVxs5I/NVrpEQOd6raOOlCeKwQWlY69QNEA==~1; SRCHHPGUSR=SRCHLANG=en&PV=10.0.0&BRW=NOTP&BRH=S&CW=334&CH=606&SCW=334&SCH=796&DPR=1.5&UTC=-240&DM=1&CIBV=1.1767.0&HV=1717698088&cdxupdttm=638532665178119281&PRVCW=1232&PRVCH=606>"
+
+async def main() -> None:
+    async with SydneyClient() as sydney:
+        while True:
+            prompt = input("You: ")
+
+            if prompt == "!reset":
+                await sydney.reset_conversation()
+                continue
+            elif prompt == "!exit":
+                break
+
+            print("Sydney: ", end="", flush=True)
+            async for response in sydney.ask_stream(prompt):
+                print(response, end="", flush=True)
+            print("\n")
 
 
-root = tk.Tk()
-root.grid_rowconfigure(0, weight=1)
-root.columnconfigure(0, weight=1)
-
-frame_main = tk.Frame(root, bg="orange")
-frame_main.grid(sticky='news')
-
-image = Image.open("smith&nephew.png")
-image = image.resize((int(image.width/2.2), int(image.height/2.2)))
-photo = ImageTk.PhotoImage(image)
-label = Label(root, image = photo)
-label.image = photo
-label.grid(row=0, sticky="n", rowspan=2)
-
-settings = tk.Button(frame_main, text="Settings")
-settings.grid(row=2, column=0)  # Start from row 2
-
-upload = tk.Button(frame_main, text="Upload")
-upload.grid(row=2, column=1)
-
-generate = tk.Button(frame_main, text="Generate")
-generate.grid(row=2, column=2)
-
-export = tk.Button(frame_main, text="Export")  # Changed variable name to 'export'
-export.grid(row=2, column=3)
-root.mainloop()
+if __name__ == "__main__":
+    asyncio.run(main())
