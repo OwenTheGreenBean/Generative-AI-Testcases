@@ -3,15 +3,20 @@ import tkinter as tk
 from tkinter import *
 import asyncio
 from tkinter.filedialog import askopenfilename
-from PIL import Image, ImageTk
 from tkinter import filedialog
+import os
 from tkinter import ttk
+from settings import settings_window
 
-
+background_color = '#F59C24'
+approve_button_color_enable = '#5DDC49'
+reject_button_color = '#EA4C1D'
+review_button_color = '#FDED11'
 
 def main() -> None:
 
     All_entries = Testcases(filedialog.askopenfilename())
+    #All_entries = Testcases("cockpit.csv")
 
     root = tk.Tk()
     root.grid_rowconfigure(0, weight=1)
@@ -19,89 +24,11 @@ def main() -> None:
     root.title("Sweetpea")
     root.geometry("450x300")
 
-
-    # Function to resize the image
-    #def resize_image(event):
-        #new_width = event.width
-        #new_height = event.height
-        #image = copy_of_image.resize((new_width, new_height))
-        #photo = ImageTk.PhotoImage(image)
-        #label.config(image=photo)
-        #label.image = photo  # Avoid garbage collection
-
-    # Load and place the background image using grid
-    #image = Image.open('backdrop.png')
-    #copy_of_image = image.copy()
-    #photo = ImageTk.PhotoImage(image)
-    #label = ttk.Label(root, image=photo)
-    #label.bind('<Configure>', resize_image)
-    #label.grid(row=0, column=0, sticky='news')
-
-
     frame_main = tk.Frame(root)
     frame_main.grid(row=0, column=0, sticky='news')
-    frame_main.configure(bg="orange")
+    frame_main.configure(bg=background_color)
 
-    def settings_window():
-
-        def setcreds(in_user, in_password):
-            print("Username:", in_user.get())
-            print("Password:", in_password.get())
-            All_entries.set_credentials(in_user.get(), in_password.get())
-
-        text_window = tk.Toplevel(root)
-        text_window.title("Settings")
-        text_window.geometry('280x300')
-        text_window.configure(bg='orange')  # Set the background color to orange
-
-        # Create and place the username label and entry
-        username_label = tk.Label(text_window, text="User: ")
-        username_label.grid(row=0, column=0, padx=10, pady=10)
-
-
-        user = StringVar()
-        username_entry = tk.Entry(text_window, textvariable=user)
-        username_entry.grid(row=0, column=1, padx=10, pady=10)
-         
-        # Create and place the password label and entry
-        password_label = tk.Label(text_window, text="Password:")
-        password_label.grid(row=1, column=0, padx=10, pady=10)
-
-        password = StringVar()
-        password_entry = tk.Entry(text_window, textvariable=password)
-        password_entry.grid(row=1, column=1, padx=10, pady=10)
-
-        # Login button
-        loginButton = tk.Button(text_window, text="Login: ", command=lambda: setcreds(user, password))
-        loginButton.grid(row=2, column=0, pady = 10, columnspan=2)  
-
-
-
-        password_label = tk.Label(text_window, text="Generation Prompt Settings")
-        password_label.grid(row=3, column=0, pady=10, columnspan=2)
-
-
-        # Variables to store the state of each checkbox
-        checkbox_vars = [tk.BooleanVar() for _ in range(8)]
-
-
-
-        # Options for the checkboxes
-        options = [
-            "Test Steps", "Test Rational", "Sample Size", "Sample Size Rational",
-            "Option 5", "Option 6", "Option 7", "Option 8"
-        ]
-
-        # Create and place checkboxes
-        for i in range(4):  # Four rows
-            for j in range(2):  # Two columns
-                index = i * 2 + j
-                checkbutton = tk.Checkbutton(text_window, text=options[index], variable=checkbox_vars[index])
-                checkbutton.grid(row=i+4, column=j, padx=10, pady=2)
-
-
-
-    settings = tk.Button(frame_main, text="Settings", command = settings_window)
+    settings = tk.Button(frame_main, text="Settings", command = lambda: settings_window(All_entries))
     settings.grid(row=0, column=0, padx=30, pady=30)
 
     def import_file(All_entries):
@@ -109,13 +36,9 @@ def main() -> None:
         if File_name:
             All_entries = Testcases(File_name)
 
-    upload = tk.Button(frame_main, text="Import", command = lambda All_entries = All_entries: import_file(All_entries))
+    upload = tk.Button(frame_main, text="Import", command = lambda All_entries: import_file(All_entries))
     upload.grid(row=0, column=1, padx=30, pady=30)
 
-
-    #def generate_all(All_entries):
-    #    for entrie in All_entries:
-    #        entrie.generate_text()
 
     def update_progress_bar(progress_bar, value):
         progress_bar['value'] = value
@@ -127,7 +50,7 @@ def main() -> None:
             await entry.generate_text()
             print("Did an entry")
             entry.set_Status("Generated")
-            buttons[i][1].config(text=entry.Status)  # Update the status button text
+            buttons[i][1].config(text=entry.Status)  # Update the status button textGT
             buttons[i][2].config(bg="grey", state="disabled")  # Disable the 'Approve' button
             update_progress_bar(progress_bar, (i + 1) / total_entries * 100)  # Update progress bar
 
@@ -139,7 +62,7 @@ def main() -> None:
         options = {
             'defaultextension': '.csv',
             'filetypes': [('CSV files', '*.csv')],
-            'initialdir': 'C:',  # You can set this to any default directory
+            'initialdir': os.path.expanduser('~/Downloads'), # You can set this to any default directory
         }
         
         # Open the save file dialog and get the selected file name
@@ -166,12 +89,11 @@ def main() -> None:
     check_approval_and_update_button()
 
     def display_review(All_entries, i):
-        print(All_entries.entries[i].Response)
         text_window = Toplevel(root)
         text_window.title(All_entries.entries[i].ID)
-        gen_text = Label(text_window, text= "Prompt: " + All_entries.entries[i].Requirment + "\n" + All_entries.entries[i].Response, bg="orange", wraplength=300, justify="left")
+        gen_text = Label(text_window, text= "Prompt: " + All_entries.entries[i].Requirment + "\n" + All_entries.entries[i].Response, bg=background_color, wraplength=300, justify="left")
         gen_text.grid(row=0, column=0, columnspan=3)
-        buttons[i][2].config(bg="green", state= "normal")
+        buttons[i][2].config(bg=approve_button_color_enable, state= "normal")
         update_status(i, "Reviewed")
         
 
@@ -182,7 +104,7 @@ def main() -> None:
 
     async def async_update_text(i):
         update_status(i, "Generated")
-        buttons[i][2].config(bg="grey", state="disabled")  # Enable the 'Approve' button
+        buttons[i][2].config(bg="grey", state="disabled")  # Disable the Approve button
         await All_entries.entries[i].generate_text()
 
 
@@ -240,10 +162,10 @@ def main() -> None:
         buttons[i][2] = tk.Button(frame_buttons, text="Approve", state= "disabled", bg = "grey", command=lambda i=i: update_status(i, "Approved"))
         buttons[i][2].grid(row=i + 1, column=2, sticky='news')
 
-        buttons[i][3] = tk.Button(frame_buttons, text=("Reject"), bg="red", command = lambda i=i: asyncio.run(async_update_text(i)))
+        buttons[i][3] = tk.Button(frame_buttons, text=("Reject"), bg=reject_button_color, command = lambda i=i: asyncio.run(async_update_text(i)))
         buttons[i][3].grid(row=i + 1, column=3, sticky='news')
 
-        buttons[i][4] = tk.Button(frame_buttons, text=("Review"), bg="yellow", command=lambda i=i: display_review(All_entries, i))
+        buttons[i][4] = tk.Button(frame_buttons, text=("Review"), bg=review_button_color, command=lambda i=i: display_review(All_entries, i))
         buttons[i][4].grid(row=i + 1, column=4, sticky='news')
 
     # Update buttons frames idle tasks to let tkinter calculate buttons sizes
