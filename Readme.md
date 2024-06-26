@@ -16,6 +16,7 @@ Operating Procedure:
 -The exported file can then be open in excel and then exported to cockpit.
 
 --------------------------------------------------------------------------------------------------------------------
+![UMLflowchart](UMLflowchart.png)
 
 window.py: This is the main program that runs the script, it is responsible for the entire UI and the calls to the backend of the program. Within window.py the test cases class is created and is manipulated through the window.py
 
@@ -26,4 +27,4 @@ entry.py: In the entry class there are variable to hold all the information for 
 copilot_calls.py: In copilot_calls there is a function that inputs a string as a prompt for the AI to then return a string with the response in it. The copilot caoll function is in a differnt file so that in the future when we plan to change the AI to a proected Copilot that it will have easy intergration.
 
 user.py: This stores the user data like password and username in a class that can then be accesed using getters and setters.
-
+![UML Class Diamgram](UMLClass.png)
