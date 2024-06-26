@@ -1,5 +1,6 @@
 Application Purpose: The purpose of this application is to take in file input from cockpit and then using that file populate it with test case descriptions generated from AI and give the user the ability to review these test cases so that they can be validated, and then the validated test cases can then be exported into a CSV and Excel format to then be uploaded back to cockpit
 
+Python version: 3.12.3
 
 Operating Procedure: 
 
